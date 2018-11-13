@@ -13,24 +13,20 @@ import CocoaAsyncSocket
 /**
  * QOS
  */
-@objc public enum CocoaMQTTQOS: UInt8, CustomStringConvertible {
+public enum CocoaMQTTQOS: UInt8, CustomStringConvertible {
     case qos0 = 0
     case qos1
     case qos2
     
     public var description: String {
-        switch self {
-            case .qos0: return "qos0"
-            case .qos1: return "qos1"
-            case .qos2: return "qos2"
-        }
+        return "qos\(rawValue)"
     }
 }
 
 /**
  * Connection State
  */
-@objc public enum CocoaMQTTConnState: UInt8, CustomStringConvertible {
+public enum CocoaMQTTConnState: UInt8, CustomStringConvertible {
     case initial = 0
     case connecting
     case connected
@@ -83,7 +79,7 @@ fileprivate enum CocoaMQTTReadTag: Int {
 /**
  * MQTT Delegate
  */
-@objc public protocol CocoaMQTTDelegate {
+public protocol CocoaMQTTDelegate: class {
     /// MQTT connected with server
     // deprecated: use mqtt(_ mqtt: CocoaMQTT, didConnectAck ack: CocoaMQTTConnAck) to tell if connect to the server successfully
     // func mqtt(_ mqtt: CocoaMQTT, didConnect host: String, port: Int)
@@ -91,14 +87,28 @@ fileprivate enum CocoaMQTTReadTag: Int {
     func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16)
     func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16)
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16 )
+    
     func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopic topic: String)
     func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopic topic: String)
     func mqttDidPing(_ mqtt: CocoaMQTT)
     func mqttDidReceivePong(_ mqtt: CocoaMQTT)
     func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?)
-    @objc optional func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void)
-    @objc optional func mqtt(_ mqtt: CocoaMQTT, didPublishComplete id: UInt16)
-    @objc optional func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState)
+    
+    func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void)
+    func mqtt(_ mqtt: CocoaMQTT, didPublishComplete id: UInt16)
+    func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState)
+}
+
+public extension CocoaMQTTDelegate {
+    func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopic topic: String) {}
+    func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopic topic: String) {}
+    func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16) {}
+    func mqttDidPing(_ mqtt: CocoaMQTT) {}
+    func mqttDidReceivePong(_ mqtt: CocoaMQTT) {}
+    
+    func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void) {}
+    func mqtt(_ mqtt: CocoaMQTT, didPublishComplete id: UInt16) {}
+    func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState) {}
 }
 
 /**
@@ -165,7 +175,7 @@ open class CocoaMQTT: NSObject, CocoaMQTTClient, CocoaMQTTFrameBufferProtocol {
     
     open var connState = CocoaMQTTConnState.initial {
         didSet {
-            delegate?.mqtt?(self, didStateChangeTo: connState)
+            delegate?.mqtt(self, didStateChangeTo: connState)
             didChangeState(self, connState)
         }
     }
@@ -400,7 +410,7 @@ extension CocoaMQTT: GCDAsyncSocketDelegate {
     public func socket(_ sock: GCDAsyncSocket, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Swift.Void) {
         printDebug("didReceiveTrust")
         
-        delegate?.mqtt?(self, didReceive: trust, completionHandler: completionHandler)
+        delegate?.mqtt(self, didReceive: trust, completionHandler: completionHandler)
         didReceiveTrust(self, trust)
     }
 
@@ -533,7 +543,7 @@ extension CocoaMQTT: CocoaMQTTReaderDelegate {
         printDebug("PUBCOMP Received: \(msgid)")
 
         buffer.sendSuccess(withMsgid: msgid)
-        delegate?.mqtt?(self, didPublishComplete: msgid)
+        delegate?.mqtt(self, didPublishComplete: msgid)
         didCompletePublish(self, msgid)
     }
 
