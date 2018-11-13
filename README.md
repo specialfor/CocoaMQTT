@@ -159,13 +159,12 @@ CocoaMQTTDelegate
 ```
 
 
-AsyncSocket and Timer
+AsyncSocket
 =====================
 
 These third-party functions are used:
 
 * [GCDAsyncSocket](https://github.com/robbiehanson/CocoaAsyncSocket)
-* [SwiftyTimer](https://github.com/radex/SwiftyTimer)
 
 
 LICENSE
