@@ -147,14 +147,29 @@ CocoaMQTTDelegate
     func mqtt(_ mqtt: CocoaMQTT, didPublishMessage message: CocoaMQTTMessage, id: UInt16)
     func mqtt(_ mqtt: CocoaMQTT, didPublishAck id: UInt16)
     func mqtt(_ mqtt: CocoaMQTT, didReceiveMessage message: CocoaMQTTMessage, id: UInt16 )
+    
     func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopic topic: String)
     func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopic topic: String)
     func mqttDidPing(_ mqtt: CocoaMQTT)
     func mqttDidReceivePong(_ mqtt: CocoaMQTT)
     func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?)
-    @objc optional func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void)
-    @objc optional func mqtt(_ mqtt: CocoaMQTT, didPublishComplete id: UInt16)
-    @objc optional func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState)
+    
+    func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void)
+    func mqtt(_ mqtt: CocoaMQTT, didPublishComplete id: UInt16)
+    func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState)
+}
+
+
+extension CocoaMQTTDelegate {
+    func mqtt(_ mqtt: CocoaMQTT, didSubscribeTopic topic: String) {}
+    func mqtt(_ mqtt: CocoaMQTT, didUnsubscribeTopic topic: String) {}
+    func mqttDidPing(_ mqtt: CocoaMQTT) {}
+    func mqttDidReceivePong(_ mqtt: CocoaMQTT) {}
+    func mqttDidDisconnect(_ mqtt: CocoaMQTT, withError err: Error?) {}
+    
+    func mqtt(_ mqtt: CocoaMQTT, didReceive trust: SecTrust, completionHandler: @escaping (Bool) -> Void) {}
+    func mqtt(_ mqtt: CocoaMQTT, didPublishComplete id: UInt16) {}
+    func mqtt(_ mqtt: CocoaMQTT, didStateChangeTo state: CocoaMQTTConnState) {}
 }
 ```
 
